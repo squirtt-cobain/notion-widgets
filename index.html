@@ -138,41 +138,48 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
       <!-- STREAK -->
       <div class="view" data-view="streak" hidden>
         <div class="grid">
+
+          <!-- Workout -->
           <div class="card center">
             <h2>Workout Streak</h2>
             <div class="big" id="streakCount">0 days</div>
             <div class="spacer"></div>
             <div class="row center" style="justify-content:center">
-              <button id="streakInc">+1</button><button id="streakReset">Reset</button>
+              <button id="streakInc">+1</button>
+              <button id="streakReset">Reset</button>
             </div>
             <div class="spacer"></div>
             <div class="muted">Tap +1 after workouts; persists.</div>
           </div>
+
+          <!-- Abstinence -->
           <div class="card center">
             <h2>Abstinence Streak</h2>
             <div class="big" id="absCount">0 days</div>
             <div class="spacer"></div>
             <div class="row center" style="justify-content:center">
-             <input id="absStartDate" type="date">
-<button id="absSave">Save</button>
-<button id="absReset">Reset</button>
+              <input id="absStartDate" type="date">
+              <button id="absSave">Save</button>
+              <button id="absReset">Reset</button>
             </div>
             <div class="spacer"></div>
             <div class="muted" id="absSince">—</div>
-            <div class="card center">
-    </div>
-  <h2>Water Intake</h2>
-  <div class="big" id="waterOz">0 / 126 oz</div>
-  <div class="muted" id="waterCount">0 / 3 Stanleys</div>
-  <div class="spacer"></div>
-  <div class="row center" style="justify-content:center">
-    <button id="waterAdd">+1 Stanley (42 oz)</button>
-    <button id="waterReset">Reset</button>
-  </div>
-  <div class="spacer"></div>
-  <div class="muted">Goal: 3 × 42 oz Stanleys = 126 oz per day</div>
-</div>
- 
+          </div>
+
+          <!-- Water -->
+          <div class="card center">
+            <h2>Water Intake</h2>
+            <div class="big" id="waterOz">0 / 126 oz</div>
+            <div class="muted" id="waterCount">0 / 3 Stanleys</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <button id="waterAdd">+1 Stanley (42 oz)</button>
+              <button id="waterReset">Reset</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted">Goal: 3 × 42 oz Stanleys = 126 oz per day</div>
+          </div>
+
         </div>
       </div>
 
@@ -308,39 +315,34 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
               <div class="muted" id="moonExplain">—</div>
             </div>
 
+            <!-- Manual Tarot Draw -->
             <div class="item">
-              <div class="flex-between"><strong>Tarot Pull</strong><button id="tarotPull">Pull</button></div>
+              <div class="flex-between">
+                <strong>Manual Draw</strong>
+                <button id="tarotSave">Save</button>
+              </div>
               <div class="spacer"></div>
-              <div id="tarotCard" class="big">—</div>
-              <div class="muted" id="tarotMeaning">—</div>
+              <div class="row">
+                <select id="tarotSelect" style="flex:1"></select>
+                <label class="row"><input id="tarotReversed" type="checkbox" style="margin-right:6px">Reversed</label>
+              </div>
+              <div class="spacer"></div>
+              <div id="tarotManualTitle" class="big">—</div>
+              <div class="muted" id="tarotManualMeaning">Pick a card to see meaning.</div>
+            </div>
+
+            <div class="item">
+              <div class="flex-between">
+                <strong>Tarot Log (Last 7)</strong>
+                <button id="tarotClear" class="small">Clear Log</button>
+              </div>
+              <div id="tarotLog" class="list" style="margin-top:6px"></div>
             </div>
 
             <div class="item">
               <div class="flex-between"><strong>Next Sabbat</strong><span id="sabbatBadge" class="badge">—</span></div>
               <div class="muted" id="sabbatExplain">—</div>
             </div>
-<div class="item">
-  <div class="flex-between">
-    <strong>Manual Draw</strong>
-    <button id="tarotSave">Save</button>
-  </div>
-  <div class="spacer"></div>
-  <div class="row">
-    <select id="tarotSelect" style="flex:1"></select>
-    <label class="row"><input id="tarotReversed" type="checkbox" style="margin-right:6px">Reversed</label>
-  </div>
-  <div class="spacer"></div>
-  <div id="tarotManualTitle" class="big">—</div>
-  <div class="muted" id="tarotManualMeaning">Pick a card to see meaning.</div>
-</div>
-
-<div class="item">
-  <div class="flex-between">
-    <strong>Tarot Log (Last 7)</strong>
-    <button id="tarotClear" class="small">Clear Log</button>
-  </div>
-  <div id="tarotLog" class="list" style="margin-top:6px"></div>
-</div>
 
           </div>
         </div>
@@ -411,6 +413,7 @@ function renderStreak(){ const n=read(streakKey,0); streakCount.textContent = n+
 $("#streakInc").addEventListener("click", ()=>{ store(streakKey, (read(streakKey,0)+1)); renderStreak(); });
 $("#streakReset").addEventListener("click", ()=>{ store(streakKey, 0); renderStreak(); });
 renderStreak();
+
 const absCount=$("#absCount"), absSince=$("#absSince");
 function renderAbs(){
   const start = read(absStartKey,null);
@@ -432,7 +435,9 @@ $("#absReset").addEventListener("click", () => {
   renderAbs();
 });
 renderAbs();
-  const waterKey = "waterOz";
+
+// WATER (42oz Stanley, goal 126oz)
+const waterKey = "waterOz";
 function renderWater() {
   const oz = read(waterKey, 0);
   const cups = Math.floor(oz / 42);
@@ -490,7 +495,7 @@ function setQC(a){ store(qcKey,a); renderQC(); }
 function renderQC(){
   const list=$("#qcList"); list.innerHTML="";
   const items=getQC().slice(-5).reverse(); // last 5
-  items.forEach((it,idx)=>{
+  items.forEach((it)=>{
     const d=document.createElement("div"); d.className="item";
     d.innerHTML = `<h3>${it.tag} • <span class="small">${new Date(it.ts).toLocaleString()}</span></h3><div class="small">${it.text}</div>`;
     list.appendChild(d);
@@ -522,7 +527,7 @@ function getPoems(){ return read(pKey,[]); }
 function setPoems(v){ store(pKey,v); renderPoems(); }
 function renderPoems(){
   const list=$("#pList"); list.innerHTML="";
-  getPoems().slice().reverse().forEach((p,i)=>{
+  getPoems().slice().reverse().forEach((p)=>{
     const div=document.createElement("div"); div.className="item";
     div.innerHTML = `<h3>${p.title} <span class="badge">${p.vibe}</span></h3>
                      <div class="small">${new Date(p.ts).toLocaleString()}</div>
@@ -539,33 +544,8 @@ $("#pSave").addEventListener("click", ()=>{
 });
 renderPoems();
 
-// WITCHCRAFT — Book of Shadows
-const bosKey="bosEntries";
-function getBOS(){ return read(bosKey,[]); }
-function setBOS(v){ store(bosKey,v); renderBOS(); }
-function renderBOS(){
-  const list=$("#bosList"); list.innerHTML="";
-  getBOS().slice().reverse().forEach(en=>{
-    const el=document.createElement("div"); el.className="item";
-    el.innerHTML = `<h3>${en.title} <span class="badge">${en.cat}</span></h3>
-                    <div class="small">${new Date(en.ts).toLocaleString()}</div>
-                    <hr><div class="small" style="white-space:pre-wrap">${en.body}</div>`;
-    list.appendChild(el);
-  });
-}
-$("#bosAdd").addEventListener("click", ()=>{
-  const t=$("#bosTitle").value.trim()||"Untitled";
-  const c=$("#bosCat").value;
-  const b=$("#bosBody").value.trim(); if(!b) return alert("Add some notes 🕯️");
-  const arr=getBOS(); arr.push({ts:Date.now(), title:t, cat:c, body:b}); setBOS(arr);
-  $("#bosTitle").value=""; $("#bosBody").value="";
-});
-$("#bosClearAll").addEventListener("click", ()=>{ if(confirm("Clear ALL Book of Shadows entries?")) setBOS([]); });
-renderBOS();
-
 // WITCHCRAFT — Moon Phase (approximation)
 function moonPhase(date=new Date()){
-  // Simple Conway-esque approximation
   const year=date.getUTCFullYear(), month=date.getUTCMonth()+1, day=date.getUTCDate();
   let r = year%100; r%=19; if (r>9) r-=19;
   r = ((r*11)%30)+month+day;
@@ -590,7 +570,7 @@ function phaseName(age){
   $("#moonExplain").textContent = `Lunar age ≈ ${age.toFixed(1)} days. Good for tuning rituals to the phase.`;
 })();
 
-// Full 78-card deck (upright short meanings)
+// WITCHCRAFT — Tarot (Manual Draw only, full 78-card deck)
 const tarotDeck = [
   // Major Arcana
   ["0 The Fool","Beginnings, leap of faith, openness"],
@@ -692,13 +672,13 @@ const tarotDeck = [
   });
 })();
 
-// Lookup helper
+// Tarot meaning lookup
 function tarotMeaningByName(name){
   const found = tarotDeck.find(([n])=> n===name);
   return found ? found[1] : "—";
 }
 
-// When user picks a card, show meaning (with optional reversed tag)
+// Manual Draw handlers
 const selEl = document.getElementById("tarotSelect");
 const revEl = document.getElementById("tarotReversed");
 const manualTitle = document.getElementById("tarotManualTitle");
@@ -709,14 +689,13 @@ function renderManualMeaning(){
   const name = selEl.value;
   const reversed = revEl?.checked;
   manualTitle.textContent = reversed ? `${name} (Reversed)` : name;
-  // For now, we show upright meaning; reversed is tagged. (We can add specific reversed meanings later.)
-  manualMeaning.textContent = tarotMeaningByName(name);
+  manualMeaning.textContent = tarotMeaningByName(name); // upright meaning shown for both; can add reversed later
 }
 selEl?.addEventListener("change", renderManualMeaning);
 revEl?.addEventListener("change", renderManualMeaning);
 renderManualMeaning();
 
-// Save to a simple daily log (last 7 shown)
+// Tarot daily log
 const tarotLogKey = "tarotLog";
 function getTarotLog(){ return read(tarotLogKey, []); }
 function setTarotLog(v){ store(tarotLogKey, v); renderTarotLog(); }
@@ -742,7 +721,6 @@ document.getElementById("tarotSave")?.addEventListener("click", ()=>{
     reversed: !!revEl.checked
   };
   const log = getTarotLog();
-  // Replace today's entry if it exists
   const i = log.findIndex(e=> e.date === entry.date);
   if(i>=0) log[i] = entry; else log.push(entry);
   setTarotLog(log);
@@ -751,10 +729,9 @@ document.getElementById("tarotSave")?.addEventListener("click", ()=>{
 document.getElementById("tarotClear")?.addEventListener("click", ()=>{
   if(confirm("Clear tarot log history?")) setTarotLog([]);
 });
-
 renderTarotLog();
 
-// WITCHCRAFT — Sabbats (Northern Hemisphere, fixed dates)
+// WITCHCRAFT — Sabbats
 const sabbats=[
   ["Yule (Winter Solstice)", 12, 21],
   ["Imbolc", 2, 1],
@@ -784,3 +761,6 @@ function nextSabbat(){
 </script>
 </body>
 </html>
+
+
+
