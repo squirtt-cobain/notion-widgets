@@ -162,7 +162,18 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
           </div>
         </div>
       </div>
-
+<div class="card center">
+  <h2>Water Intake</h2>
+  <div class="big" id="waterOz">0 / 126 oz</div>
+  <div class="muted" id="waterCount">0 / 3 Stanleys</div>
+  <div class="spacer"></div>
+  <div class="row center" style="justify-content:center">
+    <button id="waterAdd">+1 Stanley (42 oz)</button>
+    <button id="waterReset">Reset</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="muted">Goal: 3 × 42 oz Stanleys = 126 oz per day</div>
+</div>
       <!-- COUNTDOWN -->
       <div class="view" data-view="countdown" hidden>
         <div class="card center">
@@ -397,6 +408,23 @@ $("#absReset").addEventListener("click", () => {
   renderAbs();
 });
 renderAbs();
+  const waterKey = "waterOz";
+function renderWater() {
+  const oz = read(waterKey, 0);
+  const cups = Math.floor(oz / 42);
+  $("#waterOz").textContent = oz + " / 126 oz";
+  $("#waterCount").textContent = cups + " / 3 Stanleys";
+}
+$("#waterAdd").addEventListener("click", () => {
+  const oz = Math.min(126, read(waterKey, 0) + 42);
+  store(waterKey, oz);
+  renderWater();
+});
+$("#waterReset").addEventListener("click", () => {
+  store(waterKey, 0);
+  renderWater();
+});
+renderWater();
 
 // COUNTDOWN
 const cdTitle=$("#cdTitle"), cdDate=$("#cdDate"), cdTicker=$("#cdTicker"), cdLabel=$("#cdLabel");
