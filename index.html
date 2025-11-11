@@ -319,6 +319,28 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
               <div class="flex-between"><strong>Next Sabbat</strong><span id="sabbatBadge" class="badge">—</span></div>
               <div class="muted" id="sabbatExplain">—</div>
             </div>
+<div class="item">
+  <div class="flex-between">
+    <strong>Manual Draw</strong>
+    <button id="tarotSave">Save</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="row">
+    <select id="tarotSelect" style="flex:1"></select>
+    <label class="row"><input id="tarotReversed" type="checkbox" style="margin-right:6px">Reversed</label>
+  </div>
+  <div class="spacer"></div>
+  <div id="tarotManualTitle" class="big">—</div>
+  <div class="muted" id="tarotManualMeaning">Pick a card to see meaning.</div>
+</div>
+
+<div class="item">
+  <div class="flex-between">
+    <strong>Tarot Log (Last 7)</strong>
+    <button id="tarotClear" class="small">Clear Log</button>
+  </div>
+  <div id="tarotLog" class="list" style="margin-top:6px"></div>
+</div>
 
           </div>
         </div>
@@ -568,8 +590,9 @@ function phaseName(age){
   $("#moonExplain").textContent = `Lunar age ≈ ${age.toFixed(1)} days. Good for tuning rituals to the phase.`;
 })();
 
-// WITCHCRAFT — Tarot Pull (Majors only, tiny meanings)
-const majors=[
+// Full 78-card deck (upright short meanings)
+const tarotDeck = [
+  // Major Arcana
   ["0 The Fool","Beginnings, leap of faith, openness"],
   ["I The Magician","Willpower, manifestation, tools within reach"],
   ["II The High Priestess","Intuition, inner knowing, mystery"],
@@ -591,13 +614,145 @@ const majors=[
   ["XVIII The Moon","Dreams, intuition, unseen currents"],
   ["XIX The Sun","Vitality, joy, clarity"],
   ["XX Judgement","Awakening, reckoning, call to action"],
-  ["XXI The World","Completion, wholeness, integration"]
+  ["XXI The World","Completion, wholeness, integration"],
+  // Wands (A–10)
+  ["Ace of Wands","Inspiration, new passion, creative spark"],
+  ["Two of Wands","Planning, future vision, possibilities"],
+  ["Three of Wands","Expansion, momentum, looking ahead"],
+  ["Four of Wands","Celebration, harmony, homecoming"],
+  ["Five of Wands","Competition, tension, challenges"],
+  ["Six of Wands","Victory, recognition, progress"],
+  ["Seven of Wands","Courage, defense, standing your ground"],
+  ["Eight of Wands","Movement, speed, progress"],
+  ["Nine of Wands","Resilience, persistence, last stand"],
+  ["Ten of Wands","Burden, responsibility, stress"],
+  // Cups (A–10)
+  ["Ace of Cups","New emotions, love, intuition opening"],
+  ["Two of Cups","Partnership, harmony, attraction"],
+  ["Three of Cups","Friendship, celebration, joy"],
+  ["Four of Cups","Apathy, contemplation, reevaluation"],
+  ["Five of Cups","Regret, loss, learning acceptance"],
+  ["Six of Cups","Nostalgia, kindness, memories"],
+  ["Seven of Cups","Choices, illusions, daydreaming"],
+  ["Eight of Cups","Walking away, spiritual journey"],
+  ["Nine of Cups","Satisfaction, wish fulfilled"],
+  ["Ten of Cups","Harmony, family, emotional completion"],
+  // Swords (A–10)
+  ["Ace of Swords","Clarity, truth, breakthrough"],
+  ["Two of Swords","Indecision, stalemate, choices"],
+  ["Three of Swords","Heartbreak, sorrow, release"],
+  ["Four of Swords","Rest, recovery, contemplation"],
+  ["Five of Swords","Conflict, defeat, ego clash"],
+  ["Six of Swords","Transition, moving on, healing"],
+  ["Seven of Swords","Strategy, secrecy, deception"],
+  ["Eight of Swords","Restriction, trapped thoughts"],
+  ["Nine of Swords","Anxiety, worry, nightmares"],
+  ["Ten of Swords","Endings, collapse, renewal"],
+  // Pentacles (A–10)
+  ["Ace of Pentacles","New opportunity, prosperity, foundation"],
+  ["Two of Pentacles","Balance, juggling priorities"],
+  ["Three of Pentacles","Collaboration, teamwork, learning"],
+  ["Four of Pentacles","Security, control, holding on"],
+  ["Five of Pentacles","Hardship, scarcity, support available"],
+  ["Six of Pentacles","Generosity, sharing, reciprocity"],
+  ["Seven of Pentacles","Patience, long-term vision, growth"],
+  ["Eight of Pentacles","Skill, mastery, dedication"],
+  ["Nine of Pentacles","Self-sufficiency, abundance, refinement"],
+  ["Ten of Pentacles","Legacy, stability, family wealth"],
+  // Courts – Wands
+  ["Page of Wands","Curiosity, exploration, enthusiasm"],
+  ["Knight of Wands","Adventure, passion, impulsiveness"],
+  ["Queen of Wands","Confidence, independence, charisma"],
+  ["King of Wands","Leadership, vision, bold action"],
+  // Courts – Cups
+  ["Page of Cups","Creativity, messages, intuition"],
+  ["Knight of Cups","Romance, charm, pursuit of dreams"],
+  ["Queen of Cups","Compassion, empathy, emotional depth"],
+  ["King of Cups","Balance, diplomacy, emotional mastery"],
+  // Courts – Swords
+  ["Page of Swords","Ideas, curiosity, vigilance"],
+  ["Knight of Swords","Ambition, haste, decisive action"],
+  ["Queen of Swords","Truth, perception, independence"],
+  ["King of Swords","Logic, authority, clear thinking"],
+  // Courts – Pentacles
+  ["Page of Pentacles","Study, new job, manifestation"],
+  ["Knight of Pentacles","Hard work, reliability, routine"],
+  ["Queen of Pentacles","Nurture, practicality, abundance"],
+  ["King of Pentacles","Success, stability, discipline"]
 ];
-$("#tarotPull").addEventListener("click", ()=>{
-  const pick = majors[Math.floor(Math.random()*majors.length)];
-  $("#tarotCard").textContent = pick[0];
-  $("#tarotMeaning").textContent = pick[1];
+
+// Build dropdown options
+(function initTarotSelect(){
+  const sel = document.getElementById("tarotSelect");
+  if(!sel) return;
+  tarotDeck.forEach(([name])=>{
+    const o = document.createElement("option");
+    o.value = name; o.textContent = name;
+    sel.appendChild(o);
+  });
+})();
+
+// Lookup helper
+function tarotMeaningByName(name){
+  const found = tarotDeck.find(([n])=> n===name);
+  return found ? found[1] : "—";
+}
+
+// When user picks a card, show meaning (with optional reversed tag)
+const selEl = document.getElementById("tarotSelect");
+const revEl = document.getElementById("tarotReversed");
+const manualTitle = document.getElementById("tarotManualTitle");
+const manualMeaning = document.getElementById("tarotManualMeaning");
+
+function renderManualMeaning(){
+  if(!selEl) return;
+  const name = selEl.value;
+  const reversed = revEl?.checked;
+  manualTitle.textContent = reversed ? `${name} (Reversed)` : name;
+  // For now, we show upright meaning; reversed is tagged. (We can add specific reversed meanings later.)
+  manualMeaning.textContent = tarotMeaningByName(name);
+}
+selEl?.addEventListener("change", renderManualMeaning);
+revEl?.addEventListener("change", renderManualMeaning);
+renderManualMeaning();
+
+// Save to a simple daily log (last 7 shown)
+const tarotLogKey = "tarotLog";
+function getTarotLog(){ return read(tarotLogKey, []); }
+function setTarotLog(v){ store(tarotLogKey, v); renderTarotLog(); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function renderTarotLog(){
+  const el = document.getElementById("tarotLog"); if(!el) return;
+  el.innerHTML = "";
+  getTarotLog().slice(-7).reverse().forEach(entry=>{
+    const div = document.createElement("div"); div.className="item";
+    const title = entry.reversed ? `${entry.card} (Reversed)` : entry.card;
+    div.innerHTML = `<h3>${title}</h3>
+      <div class="small">${entry.date}</div>
+      <div class="small">${tarotMeaningByName(entry.card)}</div>`;
+    el.appendChild(div);
+  });
+}
+
+document.getElementById("tarotSave")?.addEventListener("click", ()=>{
+  const entry = {
+    date: todayISO(),
+    card: selEl.value,
+    reversed: !!revEl.checked
+  };
+  const log = getTarotLog();
+  // Replace today's entry if it exists
+  const i = log.findIndex(e=> e.date === entry.date);
+  if(i>=0) log[i] = entry; else log.push(entry);
+  setTarotLog(log);
+  alert("Saved today’s card.");
 });
+document.getElementById("tarotClear")?.addEventListener("click", ()=>{
+  if(confirm("Clear tarot log history?")) setTarotLog([]);
+});
+
+renderTarotLog();
 
 // WITCHCRAFT — Sabbats (Northern Hemisphere, fixed dates)
 const sabbats=[
