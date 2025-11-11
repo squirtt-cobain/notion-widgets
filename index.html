@@ -153,7 +153,9 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
             <div class="big" id="absCount">0 days</div>
             <div class="spacer"></div>
             <div class="row center" style="justify-content:center">
-              <button id="absSetStart">Set Start Date</button><button id="absReset">Reset</button>
+             <input id="absStartDate" type="date">
+<button id="absSave">Save</button>
+<button id="absReset">Reset</button>
             </div>
             <div class="spacer"></div>
             <div class="muted" id="absSince">—</div>
@@ -382,8 +384,18 @@ function renderAbs(){
   absCount.textContent = diff+" day"+(diff==1?"":"s");
   absSince.textContent = "Since "+ new Date(start).toLocaleDateString();
 }
-$("#absSetStart").addEventListener("click", ()=>{ const d=prompt("Enter start date (YYYY-MM-DD):"); if(d){ store(absStartKey,d); renderAbs(); }});
-$("#absReset").addEventListener("click", ()=>{ localStorage.removeItem(absStartKey); renderAbs(); });
+const absInput = $("#absStartDate");
+$("#absSave").addEventListener("click", () => {
+  if (absInput.value) {
+    store(absStartKey, absInput.value);
+    renderAbs();
+  }
+});
+$("#absReset").addEventListener("click", () => {
+  localStorage.removeItem(absStartKey);
+  absInput.value = "";
+  renderAbs();
+});
 renderAbs();
 
 // COUNTDOWN
