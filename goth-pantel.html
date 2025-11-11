@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Goth Panel • Life OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg: transparent;
+  --panel: rgba(10,10,12,.55);
+  --text: #f7f2f7;
+  --muted:#c7bccb;
+  --accent:#f1a6c7;
+  --accent-2:#7a4863;
+  --ring: rgba(241,166,199,.35);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+.wrap{max-width:880px;margin:0 auto;padding:14px}
+.panel{background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.35),0 0 0 1px var(--ring) inset;padding:10px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 10px 12px}
+.title{font-family:Cinzel,serif;letter-spacing:.5px;font-weight:600;font-size:18px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;max-width:100%}
+.tab{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);padding:6px 10px;border-radius:10px;cursor:pointer;font-size:13px;white-space:nowrap}
+.tab[aria-selected="true"]{background:linear-gradient(180deg,rgba(241,166,199,.22),rgba(122,72,99,.22));border-color:var(--accent-2)}
+.content{padding:10px}
+.grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+.card{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);border-radius:12px;padding:12px}
+h2{margin:0 0 8px;font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.big{font-family:Cinzel,serif;font-size:32px;line-height:1.1;letter-spacing:.5px}
+.muted{color:var(--muted);font-size:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,input,textarea,select{
+  background:rgba(255,255,255,.06);color:var(--text);
+  border:1px solid rgba(255,255,255,.15);
+  padding:6px 8px;border-radius:10px;font-size:13px
+}
+button:hover{border-color:var(--accent-2)}
+textarea{width:100%;min-height:110px;resize:vertical}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12)}
+.center{text-align:center}
+.spacer{height:6px}
+.list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto}
+.item{border:1px dashed rgba(255,255,255,.15);border-radius:10px;padding:8px}
+.item h3{margin:0 0 4px;font-size:13px}
+.small{font-size:12px}
+hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:10px 0}
+.badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05)}
+.flex-between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+@media (max-width:420px){.title{font-size:16px}.big{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel" role="region" aria-label="Goth Panel Widget">
+    <header>
+      <div class="title">🕯️ Goth Panel</div>
+      <nav class="tabs" role="tablist" aria-label="Widget Tabs">
+        <button class="tab" role="tab" data-tab="clock" aria-selected="true">Clock</button>
+        <button class="tab" role="tab" data-tab="affirmation">Affirm</button>
+        <button class="tab" role="tab" data-tab="mood">Mood</button>
+        <button class="tab" role="tab" data-tab="streak">Streak</button>
+        <button class="tab" role="tab" data-tab="countdown">Countdown</button>
+        <button class="tab" role="tab" data-tab="pomodoro">Pomodoro</button>
+        <button class="tab" role="tab" data-tab="quick">Quick Capture</button>
+        <button class="tab" role="tab" data-tab="diary">Diary</button>
+        <button class="tab" role="tab" data-tab="poetry">Poetry</button>
+        <button class="tab" role="tab" data-tab="witch">Witchcraft</button>
+      </nav>
+    </header>
+
+    <section class="content">
+      <!-- CLOCK -->
+      <div class="view" data-view="clock">
+        <div class="grid">
+          <div class="card center">
+            <h2>Current Time</h2>
+            <div id="time" class="big">--:--</div>
+            <div id="date" class="muted">—</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <label class="muted">Format:</label>
+              <select id="fmt"><option value="12">12-hour</option><option value="24">24-hour</option></select>
+              <label class="muted">Locale:</label>
+              <input id="locale" type="text" placeholder="en-US">
+            </div>
+          </div>
+          <div class="card">
+            <h2>Mini Note</h2>
+            <div class="row">
+              <input id="note" type="text" placeholder="Intention / mantra of the day…" style="flex:1">
+              <button id="saveNote">Save</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted" id="noteSaved"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AFFIRMATION -->
+      <div class="view" data-view="affirmation" hidden>
+        <div class="card center">
+          <h2>Affirmation</h2>
+          <div id="affirm" class="big">I am calm and magnetic.</div>
+          <div class="spacer"></div>
+          <div class="row center" style="justify-content:center">
+            <input id="customAffirm" type="text" placeholder="Write your own…">
+            <button id="setAffirm">Set</button>
+            <button id="randomAffirm">Random</button>
+          </div>
+          <div class="spacer"></div>
+          <div class="muted">Set in the morning; it’ll persist.</div>
+        </div>
+      </div>
+
+      <!-- MOOD -->
+      <div class="view" data-view="mood" hidden>
+        <div class="card center">
+          <h2>Today's Mood</h2>
+          <div class="row center" style="justify-content:center">
+            <button data-mood="🥰 Blissful">🥰</button>
+            <button data-mood="😊 Content">😊</button>
+            <button data-mood="😐 Meh">😐</button>
+            <button data-mood="😔 Low">😔</button>
+            <button data-mood="😡 Overwhelmed">😡</button>
+            <button data-mood="🖤 Reflective">🖤</button>
+          </div>
+          <div class="spacer"></div>
+          <div class="pill" id="moodDisplay">—</div>
+          <div class="spacer"></div>
+          <div class="muted">Resets each midnight (per day).</div>
+        </div>
+      </div>
+
+      <!-- STREAK -->
+      <div class="view" data-view="streak" hidden>
+        <div class="grid">
+          <div class="card center">
+            <h2>Workout Streak</h2>
+            <div class="big" id="streakCount">0 days</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <button id="streakInc">+1</button><button id="streakReset">Reset</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted">Tap +1 after workouts; persists.</div>
+          </div>
+
+          <div class="card center">
+            <h2>Abstinence Streak</h2>
+            <div class="big" id="absCount">0 days</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <input id="absStartDate" type="date">
+              <button id="absSave">Save</button>
+              <button id="absReset">Reset</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted" id="absSince">—</div>
+          </div>
+
+          <!-- Water card sits as a separate sibling in the grid -->
+          <div class="card center">
+            <h2>Water Intake</h2>
+            <div class="big" id="waterOz">0 / 126 oz</div>
+            <div class="muted" id="waterCount">0 / 3 Stanleys</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <button id="waterAdd">+1 Stanley (42 oz)</button>
+              <button id="waterReset">Reset</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted">Goal: 3 × 42 oz Stanleys = 126 oz per day</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COUNTDOWN -->
+      <div class="view" data-view="countdown" hidden>
+        <div class="card center">
+          <h2>Countdown</h2>
+          <div class="row center" style="justify-content:center">
+            <input id="cdTitle" type="text" placeholder="30th Birthday ✨">
+            <input id="cdDate" type="date">
+            <button id="cdSave">Save</button>
+          </div>
+          <div class="spacer"></div>
+          <div class="big" id="cdTicker">—</div>
+          <div class="muted" id="cdLabel">Set a date to begin.</div>
+        </div>
+      </div>
+
+      <!-- POMODORO -->
+      <div class="view" data-view="pomodoro" hidden>
+        <div class="grid">
+          <div class="card center">
+            <h2>Focus Timer</h2>
+            <div class="big" id="pomoClock">25:00</div>
+            <div class="spacer"></div>
+            <div class="row center" style="justify-content:center">
+              <select id="pomoMode">
+                <option value="25">Study 25</option>
+                <option value="50">Deep 50</option>
+                <option value="15">Sprint 15</option>
+              </select>
+              <button id="pomoStart">Start</button>
+              <button id="pomoPause">Pause</button>
+              <button id="pomoReset">Reset</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted">Use for reading, notes, or assignments.</div>
+          </div>
+          <div class="card">
+            <h2>Focus Task</h2>
+            <div class="row">
+              <input id="pomoTask" type="text" placeholder="What are you focusing on?" style="flex:1">
+              <button id="pomoSaveTask">Save</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="muted" id="pomoTaskLabel"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK CAPTURE (BRAIN DUMP) -->
+      <div class="view" data-view="quick" hidden>
+        <div class="card">
+          <h2>Brain Dump</h2>
+          <textarea id="qcText" placeholder="Pour it all out—ideas, to-dos, feelings…"></textarea>
+          <div class="spacer"></div>
+          <div class="flex-between">
+            <div class="row">
+              <select id="qcTag"><option>Idea</option><option>Task</option><option>Feeling</option><option>School</option></select>
+              <button id="qcSave">Add</button>
+            </div>
+            <button id="qcClear" class="small">Clear All</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Recent Captures</h2>
+          <div id="qcList" class="list"></div>
+        </div>
+      </div>
+
+      <!-- DIARY -->
+      <div class="view" data-view="diary" hidden>
+        <div class="card">
+          <h2>Diary</h2>
+          <div class="row">
+            <input id="dDate" type="date">
+            <button id="dLoad">Load</button>
+            <button id="dSave">Save</button>
+          </div>
+          <div class="spacer"></div>
+          <textarea id="dText" placeholder="How did today feel? What did you learn?"></textarea>
+          <div class="spacer"></div>
+          <div class="muted">Each date stores its own entry locally.</div>
+        </div>
+      </div>
+
+      <!-- POETRY -->
+      <div class="view" data-view="poetry" hidden>
+        <div class="grid">
+          <div class="card">
+            <h2>New Draft</h2>
+            <div class="row">
+              <input id="pTitle" type="text" placeholder="Title" style="flex:1">
+              <select id="pVibe">
+                <option>Gothic</option><option>Romance</option><option>Shadow</option><option>Haunt</option><option>Hope</option>
+              </select>
+              <button id="pSave">Save</button>
+            </div>
+            <div class="spacer"></div>
+            <textarea id="pBody" placeholder="Write your poem…"></textarea>
+          </div>
+          <div class="card">
+            <h2>Drafts</h2>
+            <div id="pList" class="list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WITCHCRAFT -->
+      <div class="view" data-view="witch" hidden>
+        <div class="grid">
+          <div class="card">
+            <h2>Book of Shadows</h2>
+            <div class="row">
+              <input id="bosTitle" type="text" placeholder="Entry title" style="flex:1">
+              <select id="bosCat">
+                <option>Ritual</option><option>Herb</option><option>Crystal</option><option>Correspondence</option><option>Spell</option>
+              </select>
+            </div>
+            <div class="spacer"></div>
+            <textarea id="bosBody" placeholder="Notes, steps, correspondences…"></textarea>
+            <div class="spacer"></div>
+            <div class="row"><button id="bosAdd">Add Entry</button><button id="bosClearAll" class="small">Clear All</button></div>
+            <div class="spacer"></div>
+            <div id="bosList" class="list"></div>
+          </div>
+
+          <div class="card">
+            <h2>Moon • Tarot • Sabbats</h2>
+
+            <div class="item">
+              <div class="flex-between"><strong>Moon Phase (Today)</strong><span id="moonBadge" class="badge">—</span></div>
+              <div class="muted" id="moonExplain">—</div>
+            </div>
+
+            <!-- Manual Tarot Draw (no random pull) -->
+            <div class="item">
+              <div class="flex-between">
+                <strong>Manual Draw</strong>
+                <button id="tarotSave">Save</button>
+              </div>
+              <div class="spacer"></div>
+              <div class="row">
+                <select id="tarotSelect" style="flex:1"></select>
+                <label class="row"><input id="tarotReversed" type="checkbox" style="margin-right:6px">Reversed</label>
+              </div>
+              <div class="spacer"></div>
+              <div id="tarotManualTitle" class="big">—</div>
+              <div class="muted" id="tarotManualMeaning">Pick a card to see meaning.</div>
+            </div>
+
+            <div class="item">
+              <div class="flex-between">
+                <strong>Tarot Log (Last 7)</strong>
+                <button id="tarotClear" class="small">Clear Log</button>
+              </div>
+              <div id="tarotLog" class="list" style="margin-top:6px"></div>
+            </div>
+
+            <div class="item">
+              <div class="flex-between"><strong>Next Sabbat</strong><span id="sabbatBadge" class="badge">—</span></div>
+              <div class="muted" id="sabbatExplain">—</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</div>
+
+<script>
+/* helper utils identical to the original feel */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const store = (k,v)=>localStorage.setItem(k, JSON.stringify(v));
+const read  = (k,d=null)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{ return d } };
+
+// Tabs
+const views = $$(".view");
+$$(".tab").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    $$(".tab").forEach(b=>b.setAttribute("aria-selected","false"));
+    btn.setAttribute("aria-selected","true");
+    const t = btn.dataset.tab;
+    views.forEach(v=>v.hidden = v.dataset.view!==t);
+  });
+});
+
+// CLOCK
+const timeEl=$("#time"), dateEl=$("#date"), fmtSel=$("#fmt"), locInput=$("#locale");
+fmtSel.value = read("fmt","12");
+locInput.value = read("loc","en-US");
+function tick(){
+  const loc = locInput.value || "en-US";
+  const opt = {hour:"2-digit",minute:"2-digit",hour12: fmtSel.value==="12"};
+  timeEl.textContent = new Date().toLocaleTimeString(loc,opt);
+  dateEl.textContent = new Date().toLocaleDateString(loc,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+}
+setInterval(tick, 250); tick();
+fmtSel.addEventListener("change", ()=>store("fmt", fmtSel.value));
+locInput.addEventListener("change", ()=>store("loc", locInput.value));
+$("#saveNote").addEventListener("click", ()=>{ store("note", $("#note").value); $("#noteSaved").textContent="Saved."; setTimeout(()=>$("#noteSaved").textContent="",1500); });
+$("#note").value = read("note","");
+
+// AFFIRM
+const defaultsAff=[
+  "I am disciplined, glowing, and guided.",
+  "Money, love, and opportunities flow to me.",
+  "My consistency is irresistible.",
+  "I am soft and powerful at once.",
+  "I honor my body and my peace."
+];
+const affEl=$("#affirm");
+function setAffirm(t){ affEl.textContent=t; store("affirm", t); }
+$("#setAffirm").addEventListener("click", ()=> setAffirm($("#customAffirm").value || affEl.textContent));
+$("#randomAffirm").addEventListener("click", ()=> setAffirm(defaultsAff[Math.floor(Math.random()*defaultsAff.length)]));
+setAffirm(read("affirm", affEl.textContent));
+
+// MOOD
+const moodDisplay=$("#moodDisplay");
+const todayKey="mood-"+new Date().toISOString().slice(0,10);
+function setMood(label){ store(todayKey,label); moodDisplay.textContent = label; }
+moodDisplay.textContent = read(todayKey,"—");
+$$(".view[data-view='mood'] button[data-mood]").forEach(b=> b.addEventListener("click", ()=> setMood(b.dataset.mood)));
+
+// STREAKS
+const streakKey="workout-streak", absStartKey="abs-start";
+const streakCount=$("#streakCount");
+function renderStreak(){ const n=read(streakKey,0); streakCount.textContent = n+" day"+(n==1?"":"s"); }
+$("#streakInc").addEventListener("click", ()=>{ store(streakKey, (read(streakKey,0)+1)); renderStreak(); });
+$("#streakReset").addEventListener("click", ()=>{ store(streakKey, 0); renderStreak(); });
+renderStreak();
+
+const absCount=$("#absCount"), absSince=$("#absSince");
+function renderAbs(){
+  const start = read(absStartKey,null);
+  if(!start){ absCount.textContent="0 days"; absSince.textContent="No start set"; return; }
+  const diff=Math.floor((Date.now()-new Date(start).getTime())/(1000*60*60*24));
+  absCount.textContent = diff+" day"+(diff==1?"":"s");
+  absSince.textContent = "Since "+ new Date(start).toLocaleDateString();
+}
+const absInput = $("#absStartDate");
+$("#absSave").addEventListener("click", () => {
+  if (absInput.value) {
+    store(absStartKey, absInput.value);
+    renderAbs();
+  }
+});
+$("#absReset").addEventListener("click", () => {
+  localStorage.removeItem(absStartKey);
+  absInput.value = "";
+  renderAbs();
+});
+renderAbs();
+
+// WATER (42 oz Stanley; goal 3 × 42 = 126 oz)
+const waterKey = "waterOz";
+function renderWater() {
+  const oz = read(waterKey, 0);
+  const cups = Math.floor(oz / 42);
+  $("#waterOz").textContent = oz + " / 126 oz";
+  $("#waterCount").textContent = cups + " / 3 Stanleys";
+}
+$("#waterAdd").addEventListener("click", () => {
+  const oz = Math.min(126, read(waterKey, 0) + 42);
+  store(waterKey, oz);
+  renderWater();
+});
+$("#waterReset").addEventListener("click", () => {
+  store(waterKey, 0);
+  renderWater();
+});
+renderWater();
+
+// COUNTDOWN
+const cdTitle=$("#cdTitle"), cdDate=$("#cdDate"), cdTicker=$("#cdTicker"), cdLabel=$("#cdLabel");
+function renderCountdown(){
+  const t=read("cdTitle","30th Birthday ✨"), d=read("cdDate",null);
+  cdTitle.value=t; if(d) cdDate.value=d;
+  if(!d){ cdTicker.textContent="—"; cdLabel.textContent="Set a date to begin."; return; }
+  const now=new Date(), target=new Date(d); const diff=target-now;
+  if(diff<=0){ cdTicker.textContent="It’s here!"; cdLabel.textContent=t; return; }
+  const days=Math.floor(diff/(1000*60*60*24));
+  const hours=Math.floor((diff/(1000*60*60))%24);
+  const mins=Math.floor((diff/(1000*60))%60);
+  cdTicker.textContent=`${days}d ${hours}h ${mins}m`;
+  cdLabel.textContent = t+" • "+ new Date(d).toLocaleDateString();
+}
+$("#cdSave").addEventListener("click", ()=>{ store("cdTitle", cdTitle.value||"Countdown"); if(cdDate.value) store("cdDate", cdDate.value); renderCountdown(); });
+renderCountdown(); setInterval(renderCountdown, 30000);
+
+// POMODORO
+const pomoClock=$("#pomoClock"), pomoMode=$("#pomoMode");
+let pomoTimer=null, remaining=read("pomoRemaining", 25*60);
+function fmt(t){ const m=String(Math.floor(t/60)).padStart(2,"0"), s=String(t%60).padStart(2,"0"); return `${m}:${s}`; }
+function drawPomo(){ pomoClock.textContent=fmt(remaining); }
+function startPomo(){ if(pomoTimer) return; pomoTimer=setInterval(()=>{ remaining=Math.max(0,remaining-1); store("pomoRemaining",remaining); drawPomo(); if(remaining===0){ clearInterval(pomoTimer); pomoTimer=null; alert("Focus block complete!"); }},1000); }
+function pausePomo(){ if(!pomoTimer) return; clearInterval(pomoTimer); pomoTimer=null; }
+function resetPomo(){ pausePomo(); remaining=Number(pomoMode.value)*60; store("pomoRemaining",remaining); drawPomo(); }
+$("#pomoStart").addEventListener("click", startPomo);
+$("#pomoPause").addEventListener("click", pausePomo);
+$("#pomoReset").addEventListener("click", resetPomo);
+pomoMode.addEventListener("change", resetPomo);
+drawPomo();
+$("#pomoTask").value = read("pomoTask",""); $("#pomoTaskLabel").textContent = read("pomoTask","(no task set)");
+$("#pomoSaveTask").addEventListener("click", ()=>{ store("pomoTask", $("#pomoTask").value); $("#pomoTaskLabel").textContent=$("#pomoTask").value || "(no task set)"; });
+
+// QUICK CAPTURE
+const qcKey="quickCaptures";
+function getQC(){ return read(qcKey,[]); }
+function setQC(a){ store(qcKey,a); renderQC(); }
+function renderQC(){
+  const list=$("#qcList"); list.innerHTML="";
+  const items=getQC().slice(-5).reverse(); // last 5
+  items.forEach((it,idx)=>{
+    const d=document.createElement("div"); d.className="item";
+    d.innerHTML = `<h3>${it.tag} • <span class="small">${new Date(it.ts).toLocaleString()}</span></h3><div class="small">${it.text}</div>`;
+    list.appendChild(d);
+  });
+}
+$("#qcSave").addEventListener("click", ()=>{
+  const txt=$("#qcText").value.trim(); if(!txt) return;
+  const tag=$("#qcTag").value;
+  const a=getQC(); a.push({ts:Date.now(), tag, text:txt});
+  setQC(a); $("#qcText").value="";
+});
+$("#qcClear").addEventListener("click", ()=>{ if(confirm("Clear all brain dump entries?")) setQC([]); });
+renderQC();
+
+// DIARY
+const dKeyBase="diary-";
+function dKey(dstr){ return dKeyBase+dstr; }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+$("#dDate").value = todayStr();
+function loadDiary(){ const k=dKey($("#dDate").value); $("#dText").value = read(k,""); }
+function saveDiary(){ const k=dKey($("#dDate").value); store(k, $("#dText").value); alert("Saved."); }
+$("#dLoad").addEventListener("click", loadDiary);
+$("#dSave").addEventListener("click", saveDiary);
+loadDiary();
+
+// WITCHCRAFT — Moon Phase (approximation)
+function moonPhase(date=new Date()){
+  const year=date.getUTCFullYear(), month=date.getUTCMonth()+1, day=date.getUTCDate();
+  let r = year%100; r%=19; if (r>9) r-=19;
+  r = ((r*11)%30)+month+day;
+  if(month<3) r+=2;
+  const res = r-8.3; const age=((res+30)%30);
+  return age; // 0 new, ~15 full
+}
+function phaseName(age){
+  if(age<1.0) return "New Moon 🌑";
+  if(age<6.0) return "Waxing Crescent 🌒";
+  if(age<8.0) return "First Quarter 🌓";
+  if(age<14.7) return "Waxing Gibbous 🌔";
+  if(age<16.0) return "Full Moon 🌕";
+  if(age<21.0) return "Waning Gibbous 🌖";
+  if(age<23.0) return "Last Quarter 🌗";
+  if(age<29.0) return "Waning Crescent 🌘";
+  return "New Moon 🌑";
+}
+(function renderMoon(){
+  const age=moonPhase(); const name=phaseName(age);
+  $("#moonBadge").textContent = name;
+  $("#moonExplain").textContent = `Lunar age ≈ ${age.toFixed(1)} days. Good for tuning rituals to the phase.`;
+})();
+
+// TAROT — Manual Draw only (full 78-card deck)
+const tarotDeck = [
+  // Major Arcana
+  ["0 The Fool","Beginnings, leap of faith, openness"],
+  ["I The Magician","Willpower, manifestation, tools within reach"],
+  ["II The High Priestess","Intuition, inner knowing, mystery"],
+  ["III The Empress","Fertility, beauty, nurture, abundance"],
+  ["IV The Emperor","Structure, boundaries, authority"],
+  ["V The Hierophant","Tradition, learning, guidance"],
+  ["VI The Lovers","Alignment, values, choice from the heart"],
+  ["VII The Chariot","Determination, victory through focus"],
+  ["VIII Strength","Courage, gentle power, resilience"],
+  ["IX The Hermit","Solitude, reflection, inner light"],
+  ["X Wheel of Fortune","Cycles, change, destiny turning"],
+  ["XI Justice","Balance, truth, fair outcomes"],
+  ["XII The Hanged One","Pause, new perspective, surrender"],
+  ["XIII Death","Transformation, endings & rebirth"],
+  ["XIV Temperance","Moderation, alchemy, harmony"],
+  ["XV The Devil","Attachments, shadow work, liberation"],
+  ["XVI The Tower","Sudden change, revelation, reset"],
+  ["XVII The Star","Hope, healing, divine guidance"],
+  ["XVIII The Moon","Dreams, intuition, unseen currents"],
+  ["XIX The Sun","Vitality, joy, clarity"],
+  ["XX Judgement","Awakening, reckoning, call to action"],
+  ["XXI The World","Completion, wholeness, integration"],
+  // Wands (A–10)
+  ["Ace of Wands","Inspiration, new passion, creative spark"],
+  ["Two of Wands","Planning, future vision, possibilities"],
+  ["Three of Wands","Expansion, momentum, looking ahead"],
+  ["Four of Wands","Celebration, harmony, homecoming"],
+  ["Five of Wands","Competition, tension, challenges"],
+  ["Six of Wands","Victory, recognition, progress"],
+  ["Seven of Wands","Courage, defense, standing your ground"],
+  ["Eight of Wands","Movement, speed, progress"],
+  ["Nine of Wands","Resilience, persistence, last stand"],
+  ["Ten of Wands","Burden, responsibility, stress"],
+  // Cups (A–10)
+  ["Ace of Cups","New emotions, love, intuition opening"],
+  ["Two of Cups","Partnership, harmony, attraction"],
+  ["Three of Cups","Friendship, celebration, joy"],
+  ["Four of Cups","Apathy, contemplation, reevaluation"],
+  ["Five of Cups","Regret, loss, learning acceptance"],
+  ["Six of Cups","Nostalgia, kindness, memories"],
+  ["Seven of Cups","Choices, illusions, daydreaming"],
+  ["Eight of Cups","Walking away, spiritual journey"],
+  ["Nine of Cups","Satisfaction, wish fulfilled"],
+  ["Ten of Cups","Harmony, family, emotional completion"],
+  // Swords (A–10)
+  ["Ace of Swords","Clarity, truth, breakthrough"],
+  ["Two of Swords","Indecision, stalemate, choices"],
+  ["Three of Swords","Heartbreak, sorrow, release"],
+  ["Four of Swords","Rest, recovery, contemplation"],
+  ["Five of Swords","Conflict, defeat, ego clash"],
+  ["Six of Swords","Transition, moving on, healing"],
+  ["Seven of Swords","Strategy, secrecy, deception"],
+  ["Eight of Swords","Restriction, trapped thoughts"],
+  ["Nine of Swords","Anxiety, worry, nightmares"],
+  ["Ten of Swords","Endings, collapse, renewal"],
+  // Pentacles (A–10)
+  ["Ace of Pentacles","New opportunity, prosperity, foundation"],
+  ["Two of Pentacles","Balance, juggling priorities"],
+  ["Three of Pentacles","Collaboration, teamwork, learning"],
+  ["Four of Pentacles","Security, control, holding on"],
+  ["Five of Pentacles","Hardship, scarcity, support available"],
+  ["Six of Pentacles","Generosity, sharing, reciprocity"],
+  ["Seven of Pentacles","Patience, long-term vision, growth"],
+  ["Eight of Pentacles","Skill, mastery, dedication"],
+  ["Nine of Pentacles","Self-sufficiency, abundance, refinement"],
+  ["Ten of Pentacles","Legacy, stability, family wealth"],
+  // Courts – Wands
+  ["Page of Wands","Curiosity, exploration, enthusiasm"],
+  ["Knight of Wands","Adventure, passion, impulsiveness"],
+  ["Queen of Wands","Confidence, independence, charisma"],
+  ["King of Wands","Leadership, vision, bold action"],
+  // Courts – Cups
+  ["Page of Cups","Creativity, messages, intuition"],
+  ["Knight of Cups","Romance, charm, pursuit of dreams"],
+  ["Queen of Cups","Compassion, empathy, emotional depth"],
+  ["King of Cups","Balance, diplomacy, emotional mastery"],
+  // Courts – Swords
+  ["Page of Swords","Ideas, curiosity, vigilance"],
+  ["Knight of Swords","Ambition, haste, decisive action"],
+  ["Queen of Swords","Truth, perception, independence"],
+  ["King of Swords","Logic, authority, clear thinking"],
+  // Courts – Pentacles
+  ["Page of Pentacles","Study, new job, manifestation"],
+  ["Knight of Pentacles","Hard work, reliability, routine"],
+  ["Queen of Pentacles","Nurture, practicality, abundance"],
+  ["King of Pentacles","Success, stability, discipline"]
+];
+
+// Build dropdown options
+(function initTarotSelect(){
+  const sel = document.getElementById("tarotSelect");
+  if(!sel) return;
+  tarotDeck.forEach(([name])=>{
+    const o = document.createElement("option");
+    o.value = name; o.textContent = name;
+    sel.appendChild(o);
+  });
+})();
+
+// Lookup helper
+function tarotMeaningByName(name){
+  const found = tarotDeck.find(([n])=> n===name);
+  return found ? found[1] : "—";
+}
+
+// Manual draw display + log
+const selEl = document.getElementById("tarotSelect");
+const revEl = document.getElementById("tarotReversed");
+const manualTitle = document.getElementById("tarotManualTitle");
+const manualMeaning = document.getElementById("tarotManualMeaning");
+
+function renderManualMeaning(){
+  if(!selEl) return;
+  const name = selEl.value;
+  const reversed = revEl?.checked;
+  manualTitle.textContent = reversed ? `${name} (Reversed)` : name;
+  manualMeaning.textContent = tarotMeaningByName(name);
+}
+selEl?.addEventListener("change", renderManualMeaning);
+revEl?.addEventListener("change", renderManualMeaning);
+renderManualMeaning();
+
+const tarotLogKey = "tarotLog";
+function getTarotLog(){ return read(tarotLogKey, []); }
+function setTarotLog(v){ store(tarotLogKey, v); renderTarotLog(); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function renderTarotLog(){
+  const el = document.getElementById("tarotLog"); if(!el) return;
+  el.innerHTML = "";
+  getTarotLog().slice(-7).reverse().forEach(entry=>{
+    const div = document.createElement("div"); div.className="item";
+    const title = entry.reversed ? `${entry.card} (Reversed)` : entry.card;
+    div.innerHTML = `<h3>${title}</h3>
+      <div class="small">${entry.date}</div>
+      <div class="small">${tarotMeaningByName(entry.card)}</div>`;
+    el.appendChild(div);
+  });
+}
+
+document.getElementById("tarotSave")?.addEventListener("click", ()=>{
+  const entry = {
+    date: todayISO(),
+    card: selEl.value,
+    reversed: !!revEl.checked
+  };
+  const log = getTarotLog();
+  const i = log.findIndex(e=> e.date === entry.date);
+  if(i>=0) log[i] = entry; else log.push(entry);
+  setTarotLog(log);
+  alert("Saved today’s card.");
+});
+document.getElementById("tarotClear")?.addEventListener("click", ()=>{
+  if(confirm("Clear tarot log history?")) setTarotLog([]);
+});
+renderTarotLog();
+
+// WITCHCRAFT — Sabbats (Northern Hemisphere, fixed dates)
+const sabbats=[
+  ["Yule (Winter Solstice)", 12, 21],
+  ["Imbolc", 2, 1],
+  ["Ostara (Spring Equinox)", 3, 20],
+  ["Beltane", 5, 1],
+  ["Litha (Summer Solstice)", 6, 21],
+  ["Lughnasadh / Lammas", 8, 1],
+  ["Mabon (Autumn Equinox)", 9, 22],
+  ["Samhain", 10, 31]
+];
+function nextSabbat(){
+  const now=new Date();
+  const year=now.getFullYear();
+  const candidates = sabbats.map(([n,m,d])=>{
+    let dt=new Date(year,m-1,d);
+    if(dt<now) dt=new Date(year+1,m-1,d);
+    return {name:n, date:dt};
+  }).sort((a,b)=>a.date-b.date);
+  return candidates[0];
+}
+(function renderSabbat(){
+  const nxt=nextSabbat();
+  const diff = Math.ceil((nxt.date - new Date())/(1000*60*60*24));
+  $("#sabbatBadge").textContent = `${nxt.name}`;
+  $("#sabbatExplain").textContent = `${diff} day(s) until ${nxt.name} • ${nxt.date.toLocaleDateString()}`;
+})();
+</script>
+</body>
+</html>
